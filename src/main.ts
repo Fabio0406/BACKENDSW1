@@ -10,9 +10,9 @@ async function bootstrap() {
   const cors = require('cors');
 
   app.use(cors({
-    origin: 'https://frontendsw1-production.up.railway.app',
+    origin: '*',
     credentials: true,
   }));
-  await app.listen(3001); //Puerto del Backend
+  await app.listen(process.env.PORT || 3001); //Puerto del Backend
 }
 bootstrap();
