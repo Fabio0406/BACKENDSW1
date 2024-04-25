@@ -10,7 +10,7 @@ async function bootstrap() {
   const cors = require('cors');
 
   app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'http://localhost:6657',
     credentials: true,
   }));
   await app.listen(3001); //Puerto del Backend
