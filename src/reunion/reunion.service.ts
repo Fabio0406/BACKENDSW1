@@ -99,7 +99,7 @@ export class ReunionService {
     async entrarReunion(codigo: string, contrasena: string): Promise<reunion | null> {
         
         const reunionb = await this.reunionRepository.findOne({
-            where: { codigo, password: contrasena },
+            where: { codigo },
         });
 
         

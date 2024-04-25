@@ -53,7 +53,7 @@ export class SoundSocket implements OnGatewayInit, OnGatewayConnection, OnGatewa
     console.log('codigo : ', codigoReunion);
     console.log('contrasena : ', password);
     console.log('usuarioId : ', usuarioId);
-    const reunion = await this.reunionController.validarCodigoYContraseña(codigoReunion, password);
+    const reunion = await this.reunionController.validarCodigoYContraseña(codigoReunion, "0");
     const reunionId = await this.reunionController.obtenerReunionPorCodigo(codigoReunion);
     const addColaborador = await this.colaboradorService.agregarColaborador(usuarioId, reunionId.id);
     if (reunion) {
