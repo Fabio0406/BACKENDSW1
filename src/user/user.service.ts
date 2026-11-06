@@ -20,7 +20,7 @@ export class UserService {
 
     const token = jwt.sign(
       { userCi: savedUser.ci, username: savedUser.nombre },
-      'my_token_unique_meetflow',
+      process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
@@ -34,7 +34,7 @@ export class UserService {
     if (usuario && (await bcrypt.compare(contrasena, usuario.contrasena))) {
       const token = jwt.sign(
         { userCi: usuario.ci, username: usuario.nombre }, 
-        'my_token_unique_meetflow',
+        process.env.JWT_SECRET,
         { expiresIn: "1h" } 
       );
       console.log('devolviendo correctamente desde el backend',usuario, token);

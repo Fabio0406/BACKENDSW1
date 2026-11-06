@@ -1,73 +1,120 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# MeetFlow Backend — API para diagramas de secuencia colaborativos
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend en **NestJS** de MeetFlow, un editor de **diagramas de secuencia UML** donde varios usuarios trabajan a la vez en una "reunión". Gestiona usuarios, reuniones y diagramas, sincroniza los cambios en tiempo real con **Socket.IO** y **convierte el diagrama en código Java, Python o JavaScript**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Forma parte de un sistema de dos repositorios:
 
-## Description
+| Repositorio | Rol |
+|---|---|
+| **Meetflow-Backend** (este) | API REST + WebSocket |
+| [Meetflow-Frontend](https://github.com/Fabio0406/Meetflow-Frontend) | Frontend en React + GoJS |
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+> Proyecto académico — Ingeniería de Software I, UAGRM (2024).
 
-## Installation
+## Funcionalidades
 
-```bash
-$ yarn install
+- **Usuarios**: registro e inicio de sesión con contraseñas cifradas (bcrypt) y token JWT.
+- **Reuniones**: cada reunión tiene un código y una contraseña para que otros usuarios se unan.
+- **Colaboradores**: registro de los usuarios que participan en cada reunión.
+- **Diagramas**: se guardan como JSON (formato de GoJS: `nodeDataArray` y `linkDataArray`).
+- **Tiempo real** (Socket.IO, namespace `/reunion`): crear o unirse a una reunión y transmitir los cambios del diagrama a todos los participantes.
+- **Exportación a SVG**: guarda la imagen del diagrama en la base de datos y en `src/public/`, accesible desde `/public/<id>.svg`.
+- **Generación de código** a partir del diagrama: **Java**, **Python** y **JavaScript**. Cada línea de vida se convierte en una clase y cada mensaje en un método.
+
+## Tecnologías
+
+- NestJS 10 (TypeScript)
+- TypeORM + PostgreSQL
+- Socket.IO (`@nestjs/websockets`, `@nestjs/platform-socket.io`)
+- bcrypt, jsonwebtoken
+- `@nestjs/serve-static` para archivos públicos
+- Desplegado en Railway
+
+## Estructura
+
+```
+src/
+├── main.ts                    # Arranque, CORS y adaptador de Socket.IO
+├── app.module.ts              # Conexión a PostgreSQL y módulos
+├── entity/                    # usuario, reunion, diagrama, colaborador
+├── user/                      # Registro y login
+├── reunion/                   # Reuniones, SVG y generación de código
+│   ├── convertJava.ts
+│   ├── convertPython.ts
+│   └── convertJavaScript.ts
+├── diagrama/                  # CRUD de diagramas
+├── colaborador/               # Agregar colaboradores
+├── websocket/                 # Gateway de Socket.IO
+├── public/                    # SVG generados
+└── pruebas.js                 # Script que simula varios clientes Socket.IO
 ```
 
-## Running the app
+## Requisitos
+
+- Node.js 18 o superior
+- PostgreSQL 12 o superior
+
+## Instalación
 
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+npm install
 ```
 
-## Test
+### Configuración
+
+Copia el archivo de ejemplo y completa los valores:
 
 ```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+cp .env.example .env
 ```
 
-## Support
+| Variable | Descripción |
+|---|---|
+| `PORT` | Puerto del servidor (por defecto `3001`) |
+| `DATABASE_URL` | Conexión a PostgreSQL, por ejemplo `postgresql://usuario:contraseña@localhost:5432/meetflowdb` |
+| `JWT_SECRET` | Texto largo y aleatorio para firmar los tokens de sesión |
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+El archivo `.env` está en `.gitignore`. **No lo subas al repositorio.**
 
-## Stay in touch
+### Base de datos
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Solo crea la base vacía; TypeORM crea las tablas solo al arrancar (`synchronize: true`):
 
-## License
+```bash
+createdb -U postgres meetflowdb
+```
 
-Nest is [MIT licensed](LICENSE).
+### Ejecutar
+
+```bash
+npm run start:dev
+```
+
+El servidor corre en `http://localhost:3001`.
+
+## Endpoints REST
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/user/register` | Registrar usuario |
+| POST | `/user/login` | Iniciar sesión (devuelve un JWT) |
+| POST | `/reuniones` | Crear reunión |
+| GET | `/reuniones/:idUsuario/reuniones` | Reuniones de un usuario |
+| POST | `/reuniones/validar` | Validar el código y la contraseña de una reunión |
+| POST | `/reuniones/savesvg` | Guardar el SVG del diagrama |
+| POST | `/reuniones/java` | Convertir el diagrama a Java |
+| POST | `/reuniones/python` | Convertir el diagrama a Python |
+| POST | `/reuniones/javascript` | Convertir el diagrama a JavaScript |
+| POST | `/diagrama/crearDiagrama` | Crear diagrama |
+| GET | `/diagrama/obtenerDiagrama/:idDiagrama` | Obtener un diagrama |
+| GET | `/diagrama/obtenerDiagramaIdReunion/:idReunion` | Diagrama de una reunión |
+| POST | `/colaborador/agregar` | Agregar colaborador a una reunión |
+
+## Eventos de Socket.IO (namespace `/reunion`)
+
+| Evento que envía el cliente | Respuesta del servidor |
+|---|---|
+| `crearReunion` | `reunionCreada` o `errorCreacionReunion` |
+| `unirseReunion` | `unirseReunionExitoso` (y `usuarioUnido` al resto) o `errorUnirseReunion` |
+| `actualizarDiagrama` | `actualizarDiagramas` a los demás participantes |
+| `guardarDiagrama` | Guarda el diagrama y lo envía a la sala |

@@ -26,8 +26,7 @@ import { colaborador } from './entity/colaborado.entity';
     /* TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
-      port: 5432,
-      password: 'Admin123',
+      port: 5432,
       username: 'postgres',
       entities: [usuario,reunion, diagrama, colaborador],
       database: 'parcial1',
